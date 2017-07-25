@@ -5,6 +5,7 @@ ddf.minim.Minim minim;
 ddf.minim.AudioInput in;
 FFT fft;
 
+PVector center;
 int pixelSize;
 ArrayList<Pixel> pixels;
 
@@ -20,6 +21,7 @@ void setup() {
   fft.logAverages(10, 1);
   println(fft.avgSize());
 
+  center = new PVector(width/2, height/2);
   pixelSize = 16;
   pixels = getPixels(g);
   
@@ -62,11 +64,26 @@ void drawFft(FFT fft) {
 }
 
 void stepPixels() {
+  float hw = width/2;
+  float hh = height/2;
+  float maxDistFromCenter = sqrt(hw*hw + hh*hh);
+
   for (int i = 0; i < pixels.size(); i++) {
     Pixel p = pixels.get(i);
-    p.x += random(-3, 3);
-    p.y += random(-3, 3);
+    float d = getDistFromCenter(p);
+    int band = constrain(floor(map(d, 0, maxDistFromCenter, 0, fft.avgSize())), 0, fft.avgSize() - 1);
+    float maxOffset = map(fft.getAvg(band), 0, 30, 0, 10);
+    p.x += random(-maxOffset, maxOffset);
+    p.y += random(-maxOffset, maxOffset);
   }
+
+  for (int i = 0; i < pixels.size(); i++) {
+    Pixel p = pixels.get(i);
+  }
+}
+
+float getDistFromCenter(Pixel p) {
+  return PVector.sub(new PVector(p.x, p.y), center).mag();
 }
 
 void drawPixels() {
