@@ -36,9 +36,8 @@ void setup() {
 }
 
 void draw() {
-  int frameMax = 2000;
-  colorMode(HSB);
-  fill(216 + map(frameCount % frameMax, 0, frameMax, 0, 255), 128, 255);
+  blendMode(BLEND);
+  fill(0, 64);
   rect(0, 0, width, height);
 
   fft.forward(in.mix);
@@ -55,7 +54,7 @@ ArrayList<Pixel> getPixels(PGraphics g) {
   ArrayList<Pixel> result = new ArrayList<Pixel>();
   for (int col = 0; col < g.width / pixelSize; col++) {
     for (int row = 0; row < g.height / pixelSize; row++) {
-      color c = color(0);
+      color c = color(random(0, 255), 128, 255, 32);
       result.add(new Pixel(c, col * pixelSize, row * pixelSize, pixelSize, pixelSize));
     }
   }
@@ -99,6 +98,7 @@ float getDistFromCenter(Pixel p) {
 }
 
 void drawPixels() {
+  blendMode(ADD);
   for (int i = 0; i < pixels.size(); i++) {
     Pixel p = pixels.get(i);
     drawPixel(p);
