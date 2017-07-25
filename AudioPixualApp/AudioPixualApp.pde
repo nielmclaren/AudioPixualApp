@@ -36,14 +36,17 @@ void setup() {
 }
 
 void draw() {
-  image(backgroundImg, 0, 0);
+  int frameMax = 2000;
+  colorMode(HSB);
+  fill(216 + map(frameCount % frameMax, 0, frameMax, 0, 255), 128, 255);
+  rect(0, 0, width, height);
 
   fft.forward(in.mix);
   stepPixels();
 
   noStroke();
   fill(32);
-  drawFft(fft);
+  //drawFft(fft);
 
   drawPixels();
 }
