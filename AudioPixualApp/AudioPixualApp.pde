@@ -5,6 +5,8 @@ ddf.minim.Minim minim;
 ddf.minim.AudioInput in;
 FFT fft;
 
+PImage backgroundImg;
+
 PVector center;
 int pixelSize;
 ArrayList<Pixel> pixels;
@@ -21,6 +23,8 @@ void setup() {
   fft.logAverages(10, 1);
   println(fft.avgSize());
 
+  backgroundImg = loadImage("background.png");
+
   center = new PVector(width/2, height/2);
   pixelSize = 16;
   pixels = getPixels(g);
@@ -32,7 +36,8 @@ void setup() {
 }
 
 void draw() {
-  background(0);
+  image(backgroundImg, 0, 0);
+
   fft.forward(in.mix);
   stepPixels();
 
@@ -47,7 +52,7 @@ ArrayList<Pixel> getPixels(PGraphics g) {
   ArrayList<Pixel> result = new ArrayList<Pixel>();
   for (int col = 0; col < g.width / pixelSize; col++) {
     for (int row = 0; row < g.height / pixelSize; row++) {
-      color c = color(random(128, 255), 128, 128);
+      color c = color(0);
       result.add(new Pixel(c, col * pixelSize, row * pixelSize, pixelSize, pixelSize));
     }
   }
