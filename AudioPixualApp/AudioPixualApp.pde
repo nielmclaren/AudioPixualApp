@@ -72,13 +72,17 @@ void stepPixels() {
     Pixel p = pixels.get(i);
     float d = getDistFromCenter(p);
     int band = constrain(floor(map(d, 0, maxDistFromCenter, 0, fft.avgSize())), 0, fft.avgSize() - 1);
-    float maxOffset = map(fft.getAvg(band), 0, 30, 0, 10);
+    float maxOffset = map(fft.getAvg(band), 0, 50, 0, 10);
     p.x += random(-maxOffset, maxOffset);
     p.y += random(-maxOffset, maxOffset);
   }
 
   for (int i = 0; i < pixels.size(); i++) {
     Pixel p = pixels.get(i);
+    PVector toOrigin = PVector.sub(new PVector(p.x, p.y), new PVector(p.ox, p.oy));
+    toOrigin.mult(0.01);
+    p.x -= toOrigin.x;
+    p.y -= toOrigin.y;
   }
 }
 
