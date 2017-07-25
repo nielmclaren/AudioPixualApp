@@ -1,4 +1,5 @@
 class Pixel {
+  public int layer;
   public color c;
   public float x;
   public float y;
@@ -9,7 +10,8 @@ class Pixel {
   public float ow;
   public float oh;
 
-  Pixel(color cArg, float xArg, float yArg, float wArg, float hArg) {
+  Pixel(int layerArg, color cArg, float xArg, float yArg, float wArg, float hArg) {
+    layer = layerArg;
     c = cArg;
     x = xArg;
     y = yArg;

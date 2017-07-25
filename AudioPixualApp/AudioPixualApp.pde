@@ -8,8 +8,8 @@ FFT fft;
 PImage backgroundImg;
 
 PVector center;
-int pixelSize;
-ArrayList<Pixel> pixels;
+ArrayList<Pixel> pixels0;
+ArrayList<Pixel> pixels1;
 
 FastBlurrer blurrer;
 FileNamer fileNamer;
@@ -26,8 +26,8 @@ void setup() {
   backgroundImg = loadImage("background.png");
 
   center = new PVector(width/2, height/2);
-  pixelSize = 16;
-  pixels = getPixels(g);
+  pixels0 = getPixels(g, 16, 0);
+  pixels1 = getPixels(g, 64, 1);
   
   int blurRadius = 16;
   blurrer = new FastBlurrer(width, height, blurRadius);
@@ -41,21 +41,23 @@ void draw() {
   rect(0, 0, width, height);
 
   fft.forward(in.mix);
-  stepPixels();
+  stepPixels(pixels0);
+  stepPixels(pixels1);
 
   noStroke();
   fill(32);
   //drawFft(fft);
 
-  drawPixels();
+  drawPixels(pixels0);
+  drawPixels(pixels1);
 }
 
-ArrayList<Pixel> getPixels(PGraphics g) {
+ArrayList<Pixel> getPixels(PGraphics g, int pixelSize, int layer) {
   ArrayList<Pixel> result = new ArrayList<Pixel>();
   for (int col = 0; col < g.width / pixelSize; col++) {
     for (int row = 0; row < g.height / pixelSize; row++) {
-      color c = color(random(0, 255), 128, 255, 32);
-      result.add(new Pixel(c, col * pixelSize, row * pixelSize, pixelSize, pixelSize));
+      color c = color(random(0, 255), 128, 255, 16 + layer * 16);
+      result.add(new Pixel(layer, c, col * pixelSize, row * pixelSize, pixelSize, pixelSize));
     }
   }
   return result;
@@ -70,7 +72,7 @@ void drawFft(FFT fft) {
   }
 }
 
-void stepPixels() {
+void stepPixels(ArrayList<Pixel> pixels) {
   float hw = width/2;
   float hh = height/2;
   float maxDistFromCenter = sqrt(hw*hw + hh*hh);
@@ -78,8 +80,8 @@ void stepPixels() {
   for (int i = 0; i < pixels.size(); i++) {
     Pixel p = pixels.get(i);
     float d = getDistFromCenter(p);
-    int band = constrain(floor(map(d, 0, maxDistFromCenter, 0, fft.avgSize())), 0, fft.avgSize() - 1);
-    float maxOffset = map(fft.getAvg(band), 0, 50, 0, 10);
+    int band = constrain(floor(map(d, 0, maxDistFromCenter, 0, fft.avgSize() - 2)), 0, fft.avgSize() - 1);
+    float maxOffset = map(fft.getAvg(band), 0, 50, 0, 10) * (1 + (float)frameCount / 10000);
     p.x += random(-maxOffset, maxOffset);
     p.y += random(-maxOffset, maxOffset);
   }
@@ -97,7 +99,7 @@ float getDistFromCenter(Pixel p) {
   return PVector.sub(new PVector(p.x, p.y), center).mag();
 }
 
-void drawPixels() {
+void drawPixels(ArrayList<Pixel> pixels) {
   blendMode(ADD);
   for (int i = 0; i < pixels.size(); i++) {
     Pixel p = pixels.get(i);
